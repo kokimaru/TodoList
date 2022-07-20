@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<!--↓①-->
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>hello</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+<header th:replace="common/header :: header_fragment()"></header>
+
+<!-- エラーメッセージ表示領域 -->
+<th:block th:if="${errorMessages}">
+    <th:block th:each="error : ${errorMessages.getAllErrors()}">
+        <div class="w-75 h-auto my-1 mx-auto pt-5">
+            <p class="text-center text-danger" th:text="${error.defaultMessage}"></p>
+        </div>
+    </th:block>
+</th:block>
+
+<!-- 投稿フォーム -->
+    <div class=" w-75 h-auto my-1 mx-auto pt-5">
+        <p class="pl-5">新しいTodoを作成する</p>
+        <form th:action="@{/register}" th:object="${TodoForm}" method="POST" class="container d-flex w-auto my-0 mx-auto">
+            <div class="w-100">
+                <label class="row">
+                    <span class="col-2 text-center">Todo名</span>
+                    <input type="text" name="title" placeholder="Todoを30文字以内で入力" class="col-9">
+                </label>
+                <label class="row my-0">
+                    <span class="col-2 text-center">期日</span>
+                    <input type="date" id="date" name="deadline" class="col-9 my-0">
+                </label>
+            </div>
+            <button class="btn btn-primary w-25 col-2 mr-3" type="submit">Todoの追加</button>
+        </form>
+    </div>
+
+    <div th:each="qiita_todo: ${todoList}" class=" w-75 h-25 my-1 mx-auto pt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-5 pl-5">
+                    <p th:text="${qiita_todo.title}" class="mb-1"></p>
+                    <p class="mb-1">期限：<span th:text="${qiita_todo.deadline}"></span></p>
+                    <p class="mb-1">作成日時：<span th:text="${qiita_todo.createTime}"></span></p>
+                </div>
+
+                <div class="col-2 d-flex justify-content-start align-items-center px-0">
+                    <a th:href="@{../edit/{id}(id=${qiita_todo.id})}" class="h-100 w-75 btn btn-info pt-4">
+                        編集
+                    </a>
+                </div>
+
+                <!-- 5:フロントサイドの編集 開始-->
+                <div th:if="${qiita_todo.status}" class="col-3 d-flex px-0">
+                    <form th:action="@{/toggle-status/{id}(id=${qiita_todo.id})}" method="post" class="w-100 container d-flex my-0 mx-auto p-o mr-2">
+                        <input type="hidden" name="_method" value="patch">
+                        <button type="submit" class="h-100 w-75 btn btn-success text-white">
+                            完了
+                        </button>
+                    </form>
+                </div>
+                <div th:unless="${qiita_todo.status}" class="col-3 d-flex px-0">
+                    <form th:action="@{/toggle-status/{id}(id=${qiita_todo.id})}" method="post" class="w-100 container d-flex my-0 mx-auto p-o mr-2">
+                        <input type="hidden" name="_method" value="patch">
+                        <button type="submit" class="h-100 w-75 btn btn-success text-white">
+                            未完了
+                        </button>
+                    </form>
+                </div>
+                <!-- 5:フロントサイドの編集 終了-->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    //9
+    <script>
+        var today = new Date();
+        today.setDate(today.getDate());
+        var yyyy = today.getFullYear();
+        var mm = ("0" + (today.getMonth() + 1)).slice(-2);
+        var dd = ("0" + today.getDate()).slice(-2);
+        $("#date").val(`${yyyy}-${mm}-${dd}`);
+    </script>
+</body>
+</html>

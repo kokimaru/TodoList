@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http:www.thymeleaf,org">
+  <header th:fragment="header_fragment()">
+    <div class="text-center bg-primary">
+      <div class="d-flex p-3">
+        <p class="display-4 w-75 pl-5 mb-0 text-left font-weight-bold">
+          <a th:href="@{/top}" class="text-dark">Todoリスト</a>
+        </p>
+        <p class="display-4 w-25 mb-0 mr-5 text-right font-weight-bold">
+          <a th:href="@{/search}" class="text-dark">検索</a>
+        </p>
+      </div>
+    </div>
+  </header>
+</html>
