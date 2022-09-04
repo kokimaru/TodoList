@@ -28,6 +28,9 @@ dependencies {
 	implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
 	//13
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	//目標③
+	implementation 'org.apache.poi:poi:5.2.2'
+	implementation 'org.apache.poi:poi-ooxml:5.2.2'
 }
 
 tasks.named('test') {

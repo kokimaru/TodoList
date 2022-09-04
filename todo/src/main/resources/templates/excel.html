@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ExcelInput</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+<header th:replace="common/header :: header_fragment()"></header>
+
+<!-- エラーメッセージ表示領域 -->
+<th:block th:if="${errorMessages}">
+    <th:block th:each="error : ${errorMessages.getAllErrors()}">
+        <div class="w-75 h-auto my-1 mx-auto pt-5">
+            <p class="text-center text-danger" th:text="${error.defaultMessage}"></p>
+        </div>
+    </th:block>
+</th:block>
+
+<!-- 入力エリア -->
+    <div class=" w-75 h-auto my-1 mx-auto pt-5">
+        <p>ExcelからTodoを取り込む</p>
+        <form th:action="@{/excel/register}" method="POST" class="container mt-5">
+            <div class="row">
+                <span class="col-2 text-center">ファイルパス</span>
+                <input type="text" name="filePath" placeholder="パスを入力してください。" class="col-7">
+                <button class="ml-3 col-2 btn btn-primary w-25 btn-lg" type="submit">Todoの追加</button>
+            </div>
+        </form>
+    </div>
+
+<!-- Todo表示エリア -->
+    <div th:each="qiita_todo: ${todoList}" class="w-75 h-25 my-1 mx-auto pt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-5 pl-5">
+                    <p th:text="${qiita_todo.title}" class="mb-1"></p>
+                    <P class="mb-1">期限：<span th:text="${qiita_todo.deadline}"></span></P>
+                    <p class="mb-1">作成日時：<span th:text="${qiita_todo.createTime}"></span></p>
+                </div>
+
+                <div class="col-2 d-flex justify-content-start align-items-center px-0">
+                    <a th:href="@{../edit/{id}(id=${qiita_todo.id})}" class="h-100 w-75 btn btn-info pt-4">
+                        編集
+                    </a>
+                </div>
+
+                <div th:if="${qiita_todo.status}" class="col-3 d-flex px-0">
+                    <form th:action="@{/toggle-status/{id}(id=${qiita_todo.id})}" method="post" class="w-100 container d-flex my-0 mx-auto p-o mr-2">
+                        <input type="hidden" name="method" value="patch">
+                        <button type="submit" class="h-100 w-75 btn-success text-white">
+                            完了
+                        </button>
+                    </form>
+                </div>
+                <div th:unless="${qiita_todo.status}" class="col-3 d-flex px-0">
+                    <form th:action="@{/toggle-status/{id}(id=${qiita_todo.id})}" method="post" class="w-100 container d-flex my-0 mx-auto p-o mr-2">
+                        <input type="hidden" name="_method" value="patch">
+                        <button type="submit" class="h-100 w-75 btn btn-success text-white">
+                            未完了
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

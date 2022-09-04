@@ -6,11 +6,30 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.FileNotFoundException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
+//目標③
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Controller //①
 @RequiredArgsConstructor
@@ -67,5 +86,32 @@ public class TodoController {
     public String edit(@ModelAttribute TodoForm formData, @PathVariable("id") long id) {
         todoService.editTodo(formData);
         return "redirect:/top";
+    }
+
+    //目標③
+    @GetMapping("/excel")
+    public String excel(Model model){
+        List<TodoEntity> todoEntityList = todoService.findAllTodo();
+        model.addAttribute("todoList", todoEntityList);
+        return "excel";
+    }
+    @PostMapping("/excel/register")
+    public String excelRegister(@Validated @ModelAttribute TodoExcelForm filePath, BindingResult error, RedirectAttributes attributes) throws EncryptedDocumentException, IOException {
+        if(error.hasErrors()){
+            attributes.addFlashAttribute("errorMessages", error);
+            return "redirect:/excel";
+        }
+
+        //Excel読込
+        ArrayList<TodoForm> excelList = todoService.getExcel(filePath, error);
+        if(error.hasErrors()){
+            attributes.addFlashAttribute("errorMessages", error);
+            return "redirect:/excel";
+        }
+
+        //Todo登録（Excel）
+        todoService.setTodoExcel(excelList);
+
+        return "redirect:/excel";
     }
 }
