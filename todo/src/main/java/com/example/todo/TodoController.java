@@ -6,30 +6,12 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.FileNotFoundException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-//目標③
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 @Controller //①
 @RequiredArgsConstructor
@@ -96,7 +78,7 @@ public class TodoController {
         return "excel";
     }
     @PostMapping("/excel/register")
-    public String excelRegister(@Validated @ModelAttribute TodoExcelForm filePath, BindingResult error, RedirectAttributes attributes) throws EncryptedDocumentException, IOException {
+    public String excelRegister(@Validated @ModelAttribute TodoExcelForm filePath, BindingResult error, RedirectAttributes attributes) {
         if(error.hasErrors()){
             attributes.addFlashAttribute("errorMessages", error);
             return "redirect:/excel";

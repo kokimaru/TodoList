@@ -25,7 +25,7 @@
             <div class="row">
                 <span class="col-2 text-center">ファイルパス</span>
                 <input type="text" name="filePath" placeholder="パスを入力してください。" class="col-7">
-                <button class="ml-3 col-2 btn btn-primary w-25 btn-lg" type="submit">Todoの追加</button>
+                <button class="ml-3 col-2 btn btn-primary btn-lg" type="submit">Todoの追加</button>
             </div>
         </form>
     </div>
@@ -36,14 +36,14 @@
             <div class="row">
                 <div class="col-5 pl-5">
                     <p th:text="${qiita_todo.title}" class="mb-1"></p>
-                    <P class="mb-1">期限：<span th:text="${qiita_todo.deadline}"></span></P>
+                    <p class="mb-1">期限：<span th:text="${qiita_todo.deadline}"></span></p>
                     <p class="mb-1">作成日時：<span th:text="${qiita_todo.createTime}"></span></p>
                 </div>
 
-                <div class="col-2 d-flex justify-content-start align-items-center px-0">
-                    <a th:href="@{../edit/{id}(id=${qiita_todo.id})}" class="h-100 w-75 btn btn-info pt-4">
-                        編集
-                    </a>
+                <div class="col-2 d-flex justify-content-start px-0">
+                    <form th:action="@{../edit/{id}(id=${qiita_todo.id})}" method="get"  class="w-100 d-flex">
+                        <button type="submit"class="h-100 w-75 btn btn-info">編集</button>
+                    </form>
                 </div>
 
                 <div th:if="${qiita_todo.status}" class="col-3 d-flex px-0">

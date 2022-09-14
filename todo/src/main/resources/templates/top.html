@@ -45,10 +45,10 @@
                     <p class="mb-1">作成日時：<span th:text="${qiita_todo.createTime}"></span></p>
                 </div>
 
-                <div class="col-2 d-flex justify-content-start align-items-center px-0">
-                    <a th:href="@{../edit/{id}(id=${qiita_todo.id})}" class="h-100 w-75 btn btn-info pt-4">
-                        編集
-                    </a>
+                <div class="col-2 d-flex justify-content-start px-0">
+                    <form th:action="@{../edit/{id}(id=${qiita_todo.id})}" method="get"  class="w-100 d-flex">
+                        <button type="submit"class="h-100 w-75 btn btn-info">編集</button>
+                    </form>
                 </div>
 
                 <!-- 5:フロントサイドの編集 開始-->

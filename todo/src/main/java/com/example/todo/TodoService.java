@@ -1,5 +1,6 @@
 package com.example.todo;
 
+import com.example.todo.common.Error;
 import com.example.todo.dao.TodoEntity;
 import com.example.todo.dao.TodoRepository;
 import com.example.todo.exception.TodoNotFoundException;
@@ -15,12 +16,8 @@ import org.springframework.validation.FieldError;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -69,44 +66,49 @@ public class TodoService {
     }
 
     //目標③ Excel読込
-    public ArrayList<TodoForm> getExcel(TodoExcelForm filePath, BindingResult error) throws EncryptedDocumentException, IOException{
+    /**
+     *
+     * @param filePath 画面で入力したExcelのパス
+     * @param error エラー
+     * @return Excelから取得したデータ
+     */
+    public ArrayList<TodoForm> getExcel(TodoExcelForm filePath, BindingResult error){
 
-        TodoEntity todo = new TodoEntity();
+        //リターン用のインスタンスを作成
         ArrayList<TodoForm> excelList = new ArrayList<>();
-
-        String errorMsg = null;
 
         //読込対象のExcelパス
         String path = filePath.getFilePath();
 
-        //Excelのインスタンスを作成
+        //Excel読込用の変数を初期化
         Workbook workbook = null;
 
         try {
-            workbook = WorkbookFactory.create((new File(path)));
+            workbook = WorkbookFactory.create(new File(path));
         } catch (FileNotFoundException e) {
             //ファイルの存在チェックエラー（ファイルが存在しない場合、エラー）
-            errorMsg = "ファイルが存在しません。";
-            FieldError fieldError = new FieldError(error.getObjectName(), "filePath", errorMsg);
-            error.addError(fieldError);
+            String errorMsg = "ファイルが存在しません。";
+            Error.setError(error,"filePath",errorMsg);
             return excelList;
-        } catch (Exception e){
-            //その他エラー（ファイルを読み込めない場合、エラー）
-            errorMsg = "ファイル形式を「xlsx」または「xls」にしてください。";
-            FieldError fieldError = new FieldError(error.getObjectName(), "filePath", errorMsg);
-            error.addError(fieldError);
+        } catch (EncryptedDocumentException e) {
+            //ファイルにパスワードが設定されている場合、エラー
+            String errorMsg = "ファイルをオープンできません。（パスワードが設定されています。）";
+            Error.setError(error,"filePath",errorMsg);
+            return excelList;
+        } catch (IOException  e) {
+            //ファイルが読み込めない場合、エラー
+            String errorMsg = "ファイルをオープンできません。";
+            Error.setError(error,"filePath",errorMsg);
             return excelList;
         }
 
         //シートを指定
-        Sheet sheet = null;
-        sheet = workbook.getSheet("INPUT_DATA");
+        Sheet sheet = workbook.getSheet("INPUT_DATA");
 
         if (sheet == null) {
             //シートの形式チェック
-            errorMsg = "シート名を「INPUT_DATA」にしてください。";
-            FieldError fieldError = new FieldError(error.getObjectName(), "filePath", errorMsg);
-            error.addError(fieldError);
+            String errorMsg = "シート名を「INPUT_DATA」にしてください。";
+            Error.setError(error,"filePath",errorMsg);
             return excelList;
         }
 
@@ -115,9 +117,8 @@ public class TodoService {
 
         //ファイルデータの必須チェック（項目行以降がNULLの場合、エラー）
         if(rows < 2){
-            errorMsg = "データを入力してください。";
-            FieldError fieldError = new FieldError(error.getObjectName(), "filePath", errorMsg);
-            error.addError(fieldError);
+            String errorMsg = "データを入力してください。";
+            Error.setError(error,"filePath",errorMsg);
             return excelList;
         }
 
@@ -132,40 +133,35 @@ public class TodoService {
 
             //セルに入力されている値を取得（タイトル）
             Cell cellTitle = row.getCell(0);
-            String title = null;
 
             //タイトルの必須チェック
             if (cellTitle == null || cellTitle.getCellType() == CellType.BLANK) {
                 //期日の必須チェック(空の場合、エラー)
                 CellReference ref = new CellReference(i, 0);
-                errorMsg = ref.formatAsString() + "セル:" + "「title」を入力してください。";
-                FieldError fieldError = new FieldError(error.getObjectName(), "filePath", errorMsg);
-                error.addError(fieldError);
+                String errorMsg = ref.formatAsString() + "セル:" + "「title」を入力してください。";
+                Error.setError(error,"filePath",errorMsg);
                 return excelList;
             }
 
             //タイトルの桁数チェック
-            title = cellTitle.getStringCellValue();
+            String title = cellTitle.getStringCellValue();
             if (1 > title.length() || 30 < title.length()) {
                 CellReference ref = new CellReference(i, 0);
-                errorMsg = ref.formatAsString()+"セル:"+"「title」を1 から 30 の間のサイズにしてください。";
-                FieldError fieldError = new FieldError(error.getObjectName(), "filePath", errorMsg);
-                error.addError(fieldError);
+                String errorMsg = ref.formatAsString()+"セル:"+"「title」を1 から 30 の間のサイズにしてください。";
+                Error.setError(error,"filePath",errorMsg);
                 return excelList;
             }
 
             //セルに入力されている値を取得（期日）
             Cell cellDeadline = row.getCell(1);
-            String deadlineSt = null;
             LocalDate deadlineLd = null;
 
             //期日の必須チェック
             if (cellDeadline == null || cellDeadline.getCellType() == CellType.BLANK) {
                 //期日の必須チェック(空の場合、エラー)
                 CellReference ref = new CellReference(i, 1);
-                errorMsg = ref.formatAsString() + "セル:" + "「deadline」を入力してください。";
-                FieldError fieldError = new FieldError(error.getObjectName(), "filePath", errorMsg);
-                error.addError(fieldError);
+                String errorMsg = ref.formatAsString() + "セル:" + "「deadline」を入力してください。";
+                Error.setError(error,"filePath",errorMsg);
                 return excelList;
             }
 
@@ -173,22 +169,15 @@ public class TodoService {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
             try {
-                //期日が日付型である場合、後続処理へ
-                deadlineLd = LocalDate.from(cellDeadline.getLocalDateTimeCellValue());
-            }catch (IllegalStateException e) {
-                //期日が日付型でない場合
-                try {
-                    //期日が"yyyy-MM-dd"形式である場合、後続処理へ
-                    deadlineSt = cellDeadline.getStringCellValue();
-                    deadlineLd = LocalDate.parse(deadlineSt, dtf);
-                } catch (Exception e1) {
-                    //期日が"yyyy-MM-dd"形式で無い場合、エラー
-                    CellReference ref = new CellReference(i, 1);
-                    errorMsg = ref.formatAsString()+"セル:"+"「deadline」を日付形式(yyyy-MM-dd)にしてください。";
-                    FieldError fieldError = new FieldError(error.getObjectName(), "filePath", errorMsg);
-                    error.addError(fieldError);
-                    return excelList;
-                }
+                //期日が"yyyy-MM-dd"形式である場合、後続処理へ
+                DataFormatter formatter = new DataFormatter();
+                deadlineLd = LocalDate.parse(formatter.formatCellValue(cellDeadline), dtf);
+            } catch (Exception e1) {
+                //期日が"yyyy-MM-dd"形式で無い場合、エラー
+                CellReference ref = new CellReference(i, 1);
+                String errorMsg = ref.formatAsString()+"セル:"+"「deadline」を日付形式(yyyy-MM-dd)にしてください。";
+                Error.setError(error,"filePath",errorMsg);
+                return excelList;
             }
 
             //Excelから取得したデータを格納する
@@ -200,6 +189,10 @@ public class TodoService {
         return excelList;
     }
 
+    /**
+     *
+     * @param excelList  Excelから取得したデータ
+     */
     public void setTodoExcel(ArrayList<TodoForm> excelList) {
         int excelListLen = excelList.size();
         for (int i = 1; i <= excelListLen; i++) {
