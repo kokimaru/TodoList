@@ -65,8 +65,10 @@ public class TodoService {
         todoRepository.save(todoEntity);
     }
 
-    //目標③ Excel読込
+
     /**
+     * 目標③ Excel読込
+     * Excelファイルからデータを取得するメソッド
      *
      * @param filePath 画面で入力したExcelのパス
      * @param error エラー
@@ -190,6 +192,8 @@ public class TodoService {
     }
 
     /**
+     * 目標③ Excel読込
+     * 複数データをDBに登録するメソッド
      *
      * @param excelList  Excelから取得したデータ
      */
