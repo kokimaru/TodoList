@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="ja" xmlns:th="http:www.thymeleaf,org">
-  <header th:fragment="header_fragment()">
-    <div class="text-center bg-primary">
-      <div class="d-flex p-3">
-        <p class="display-4 pl-5 mb-0 text-left font-weight-bold" style="width: calc(100% / 3)">
-          <a th:href="@{/top}" class="text-dark">Todoリスト</a>
-        </p>
-        <p class="display-4 mb-0 text-center font-weight-bold" style="width: calc(100% / 3)">
-          <a th:href="@{/excel}" class="text-dark">Excel取込</a>
-        </p>
-        <p class="display-4 mb-0 mr-5 text-right font-weight-bold" style="width: calc(100% / 3)">
-          <a th:href="@{/search}" class="text-dark">検索</a>
-        </p>
-      </div>
+<header th:fragment="header_fragment()">
+  <div class="text-center bg-primary">
+    <div class="row p-3 display-4 font-weight-bold">
+      <p class="col mb-0 text-left">
+        <a th:href="@{/top}" class="text-dark pl-5">Todoリスト</a>
+      </p>
+      <p class="col mb-0 text-center">
+        <a th:href="@{/excel}" class="text-dark">Excel取込</a>
+      </p>
+      <p class="col mb-0 text-right">
+        <a th:href="@{/search}" class="text-dark pr-5">検索</a>
+      </p>
     </div>
-  </header>
+  </div>
+</header>
 </html>
