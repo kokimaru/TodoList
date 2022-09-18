@@ -11,7 +11,6 @@ import org.apache.poi.ss.util.CellReference;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -89,18 +88,15 @@ public class TodoService {
             workbook = WorkbookFactory.create(new File(path));
         } catch (FileNotFoundException e) {
             //ファイルの存在チェックエラー（ファイルが存在しない場合、エラー）
-            String errorMsg = "ファイルが存在しません。";
-            Error.setError(error,"filePath",errorMsg);
+            Error.setError(error,"filePath","ファイルが存在しません。");
             return excelList;
         } catch (EncryptedDocumentException e) {
             //ファイルにパスワードが設定されている場合、エラー
-            String errorMsg = "ファイルをオープンできません。（パスワードが設定されています。）";
-            Error.setError(error,"filePath",errorMsg);
+            Error.setError(error,"filePath","ファイルをオープンできません。（パスワードが設定されています。）");
             return excelList;
         } catch (IOException  e) {
             //ファイルが読み込めない場合、エラー
-            String errorMsg = "ファイルをオープンできません。";
-            Error.setError(error,"filePath",errorMsg);
+            Error.setError(error,"filePath","ファイルをオープンできません。");
             return excelList;
         }
 
@@ -109,8 +105,7 @@ public class TodoService {
 
         if (sheet == null) {
             //シートの形式チェック
-            String errorMsg = "シート名を「INPUT_DATA」にしてください。";
-            Error.setError(error,"filePath",errorMsg);
+            Error.setError(error,"filePath","シート名を「INPUT_DATA」にしてください。");
             return excelList;
         }
 
@@ -119,8 +114,7 @@ public class TodoService {
 
         //ファイルデータの必須チェック（項目行以降がNULLの場合、エラー）
         if(rows < 2){
-            String errorMsg = "データを入力してください。";
-            Error.setError(error,"filePath",errorMsg);
+            Error.setError(error,"filePath","データを入力してください。");
             return excelList;
         }
 
@@ -140,8 +134,7 @@ public class TodoService {
             if (cellTitle == null || cellTitle.getCellType() == CellType.BLANK) {
                 //期日の必須チェック(空の場合、エラー)
                 CellReference ref = new CellReference(i, 0);
-                String errorMsg = ref.formatAsString() + "セル:" + "「title」を入力してください。";
-                Error.setError(error,"filePath",errorMsg);
+                Error.setError(error,"filePath",ref.formatAsString() + "セル:" + "「title」を入力してください。");
                 return excelList;
             }
 
@@ -149,8 +142,7 @@ public class TodoService {
             String title = cellTitle.getStringCellValue();
             if (1 > title.length() || 30 < title.length()) {
                 CellReference ref = new CellReference(i, 0);
-                String errorMsg = ref.formatAsString()+"セル:"+"「title」を1 から 30 の間のサイズにしてください。";
-                Error.setError(error,"filePath",errorMsg);
+                Error.setError(error,"filePath",ref.formatAsString()+"セル:"+"「title」を1 から 30 の間のサイズにしてください。");
                 return excelList;
             }
 
@@ -162,8 +154,7 @@ public class TodoService {
             if (cellDeadline == null || cellDeadline.getCellType() == CellType.BLANK) {
                 //期日の必須チェック(空の場合、エラー)
                 CellReference ref = new CellReference(i, 1);
-                String errorMsg = ref.formatAsString() + "セル:" + "「deadline」を入力してください。";
-                Error.setError(error,"filePath",errorMsg);
+                Error.setError(error,"filePath",ref.formatAsString() + "セル:" + "「deadline」を入力してください。");
                 return excelList;
             }
 
@@ -177,8 +168,7 @@ public class TodoService {
             } catch (Exception e1) {
                 //期日が"yyyy-MM-dd"形式で無い場合、エラー
                 CellReference ref = new CellReference(i, 1);
-                String errorMsg = ref.formatAsString()+"セル:"+"「deadline」を日付形式(yyyy-MM-dd)にしてください。";
-                Error.setError(error,"filePath",errorMsg);
+                Error.setError(error,"filePath",ref.formatAsString()+"セル:"+"「deadline」を日付形式(yyyy-MM-dd)にしてください。");
                 return excelList;
             }
 

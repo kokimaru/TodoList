@@ -28,7 +28,7 @@ public class TodoController {
 
     @PostMapping("/register")
     public String register(@Validated @ModelAttribute TodoForm formDate, BindingResult error, RedirectAttributes attributes) {
-        if(error.hasErrors()){
+        if (error.hasErrors()) {
             attributes.addFlashAttribute("errorMessages", error);
             return "redirect:/top";
         }
@@ -72,21 +72,22 @@ public class TodoController {
 
     //目標③
     @GetMapping("/excel")
-    public String excel(Model model){
+    public String excel(Model model) {
         List<TodoEntity> todoEntityList = todoService.findAllTodo();
         model.addAttribute("todoList", todoEntityList);
         return "excel";
     }
+
     @PostMapping("/excel/register")
     public String excelRegister(@Validated @ModelAttribute TodoExcelForm filePath, BindingResult error, RedirectAttributes attributes) {
-        if(error.hasErrors()){
+        if (error.hasErrors()) {
             attributes.addFlashAttribute("errorMessages", error);
             return "redirect:/excel";
         }
 
         //Excel読込
         ArrayList<TodoForm> excelList = todoService.getExcel(filePath, error);
-        if(error.hasErrors()){
+        if (error.hasErrors()) {
             attributes.addFlashAttribute("errorMessages", error);
             return "redirect:/excel";
         }
