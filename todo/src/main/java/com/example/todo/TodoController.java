@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller //①
@@ -27,7 +28,7 @@ public class TodoController {
 
     @PostMapping("/register")
     public String register(@Validated @ModelAttribute TodoForm formDate, BindingResult error, RedirectAttributes attributes) {
-        if(error.hasErrors()){
+        if (error.hasErrors()) {
             attributes.addFlashAttribute("errorMessages", error);
             return "redirect:/top";
         }
@@ -67,5 +68,33 @@ public class TodoController {
     public String edit(@ModelAttribute TodoForm formData, @PathVariable("id") long id) {
         todoService.editTodo(formData);
         return "redirect:/top";
+    }
+
+    //目標③
+    @GetMapping("/excel")
+    public String excel(Model model) {
+        List<TodoEntity> todoEntityList = todoService.findAllTodo();
+        model.addAttribute("todoList", todoEntityList);
+        return "excel";
+    }
+
+    @PostMapping("/excel/register")
+    public String excelRegister(@Validated @ModelAttribute TodoExcelForm filePath, BindingResult error, RedirectAttributes attributes) {
+        if (error.hasErrors()) {
+            attributes.addFlashAttribute("errorMessages", error);
+            return "redirect:/excel";
+        }
+
+        //Excel読込
+        ArrayList<TodoForm> excelList = todoService.getExcel(filePath, error);
+        if (error.hasErrors()) {
+            attributes.addFlashAttribute("errorMessages", error);
+            return "redirect:/excel";
+        }
+
+        //Todo登録（Excel）
+        todoService.setTodoExcel(excelList);
+
+        return "redirect:/excel";
     }
 }
